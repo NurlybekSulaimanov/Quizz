@@ -28,25 +28,32 @@ const MyComponents = ({ data }) => {
   if (data && Array.isArray(data)) {
     const currentQuestion = data[currentQuestionIndex];
 
+    let answers = currentQuestion.incorrectAnswers;
+    answers.push(currentQuestion.correctAnswer);
+    for (let i = answers.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [answers[i], answers[j]] = [answers[j], answers[i]];
+    }
+
     return (
       <div>
         <CCard style={{ width: "18rem" }}>
           <CListGroup flush>
+            <CListGroupItem>{currentQuestion.question.text}</CListGroupItem>
             <CListGroupItem>
-              <CButton>{currentQuestion.incorrectAnswers[1]}</CButton>
+              <CButton color="light">{answers[1]}</CButton>
             </CListGroupItem>
             <CListGroupItem>
-              <CButton>{currentQuestion.correctAnswer}</CButton>
+              <CButton color="light">{answers[3]}</CButton>
             </CListGroupItem>
             <CListGroupItem>
-              <CButton>{currentQuestion.incorrectAnswers[0]}</CButton>
+              <CButton color="light">{answers[0]}</CButton>
             </CListGroupItem>
             <CListGroupItem>
-              <CButton>{currentQuestion.incorrectAnswers[2]}</CButton>
+              <CButton color="light">{answers[2]}</CButton>
             </CListGroupItem>
           </CListGroup>
         </CCard>
-        <div>{currentQuestion.question.text}</div>
         <div>
           <button onClick={handleNextQuestion}>Next question</button>
         </div>
