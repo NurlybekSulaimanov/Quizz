@@ -41,16 +41,24 @@ const MyComponents = ({ data }) => {
           <CListGroup flush>
             <CListGroupItem>{currentQuestion.question.text}</CListGroupItem>
             <CListGroupItem>
-              <CButton color="light">{answers[1]}</CButton>
+              <div className="d-grid gap-2">
+                <CButton color="light">{answers[0]}</CButton>
+              </div>
             </CListGroupItem>
             <CListGroupItem>
-              <CButton color="light">{answers[3]}</CButton>
+            <div className="d-grid gap-2">
+                <CButton color="light">{answers[1]}</CButton>
+              </div>
             </CListGroupItem>
             <CListGroupItem>
-              <CButton color="light">{answers[0]}</CButton>
+            <div className="d-grid gap-2">
+                <CButton color="light">{answers[3]}</CButton>
+              </div>
             </CListGroupItem>
             <CListGroupItem>
-              <CButton color="light">{answers[2]}</CButton>
+            <div className="d-grid gap-2">
+                <CButton color="light">{answers[2]}</CButton>
+              </div>
             </CListGroupItem>
           </CListGroup>
         </CCard>
