@@ -19,19 +19,11 @@ const MyComponent = () => {
 };
 let correct = 0;
 let wrong = 0;
-let shufle = false;
-
+let selectedAnswer = null;
 const MyComponents = ({ data }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(null);
-
-  const handleNextQuestion = () => {
-    if (currentQuestionIndex < data.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedButtonIndex(null);
-    }
-  };
-
+  const [shuffle, setShuffle] = useState(true);
   if (data && Array.isArray(data)) {
     const currentQuestion = data[currentQuestionIndex];
 
@@ -39,28 +31,35 @@ const MyComponents = ({ data }) => {
       ...currentQuestion.incorrectAnswers,
       currentQuestion.correctAnswer,
     ];
-
-    if (shufle !== true) {
-      shufle = true;
-      console.log(shufle);
+    if (shuffle === true) {
+      setShuffle(false);
       for (let i = answers.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [answers[i], answers[j]] = [answers[j], answers[i]];
       }
+      console.log("answers");
     }
 
     const handleButtonClick = (index) => {
       setSelectedButtonIndex(index);
-
+      selectedAnswer = answers[index];
+    };
+    const handleNextQuestion = () => {
       const currentQuestion = data[currentQuestionIndex];
-      const selectedAnswer = answers[index];
-      console.log(selectedAnswer, currentQuestion);
+      console.log(selectedAnswer, currentQuestion.correctAnswer);
       if (selectedAnswer === currentQuestion.correctAnswer) {
         correct += 1;
       } else {
         wrong += 1;
       }
+      
+      if (currentQuestionIndex < data.length - 1) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+        setSelectedButtonIndex(null);
+        setShuffle(true);
+      }
     };
+
     return (
       <div>
         <CCard style={{ width: "18rem" }}>
