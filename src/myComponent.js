@@ -1,95 +1,92 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchData } from "./thunk_action_Creator";
-import React from "react";
-import { useState } from "react";
+import React, { useCallback } from "react";
+import { useState, useEffect } from "react";
 import "@coreui/coreui/dist/css/coreui.min.css";
-const MyComponent = () => {
-  const dispatch = useDispatch();
-  let data = [];
-  data = useSelector((state) => state.data);
-  useEffect(() => {
-    dispatch(fetchData());
-  }, [dispatch]);
+import { MyComponent } from "./functions";
 
-  return (
-    <div>{data && Array.isArray(data) && <MyComponents data={data} />}</div>
-  );
-};
-
-let correct = 0;
-let wrong = 0;
-let selectedAnswer = null;
-
-const MyComponents = ({ data }) => {
+export const MyComponents = ({ questions }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(null);
-  const [seconds, setSeconds] = useState(120);
+  const [quizCompleted, setQuizCompleted] = useState(false);
+  const [correct, setCorrect] = useState(0);
+  const [wrong, setWrong] = useState(0);
+  const [seconds, setSeconds] = useState(15);
+  const currentQuestion = questions[currentQuestionIndex];
+  let answers = currentQuestion.answers;
+  const handleNextQuestion = useCallback(() => {
+    const currentQuestion = questions[currentQuestionIndex];
+    const selectedAnswer = answers[selectedButtonIndex];
+
+    if (selectedAnswer === currentQuestion.correctAnswer) {
+      setCorrect((prevCorrect) => prevCorrect + 1);
+    } else {
+      setWrong((prevWrong) => prevWrong + 1);
+    }
+
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+      setSelectedButtonIndex(null);
+      setSeconds(15);
+    } else {
+      setQuizCompleted(true);
+    }
+  }, [answers, currentQuestionIndex, questions, selectedButtonIndex]);
 
   useEffect(() => {
-    let timer;
-
-    const handleTimer = () => {
+    const timer = setInterval(() => {
       setSeconds((prevSeconds) => prevSeconds - 1);
-    };
-    if (seconds > 0) {
-      timer = setTimeout(handleTimer, 1000);
-    }
-    return () => clearTimeout(timer);
-  }, [seconds]);
+    }, 1000);
 
-  if (data && Array.isArray(data)) {
-    const currentQuestion = data[currentQuestionIndex];
-    let answers = [
-      ...currentQuestion.incorrectAnswers,
-      currentQuestion.correctAnswer,
-    ];
-    const handleButtonClick = (index) => {
-      setSelectedButtonIndex(index);
-      selectedAnswer = answers[index];
-    };
-    const handleNextQuestion = () => {
-      const currentQuestion = data[currentQuestionIndex];
-      console.log(selectedAnswer, currentQuestion.correctAnswer);
-      if (selectedAnswer === currentQuestion.correctAnswer) {
-        correct += 1;
-      } else {
-        wrong += 1;
-      }
-      if (currentQuestionIndex < data.length - 1) {
-        setCurrentQuestionIndex(currentQuestionIndex + 1);
-        setSelectedButtonIndex(null);
-        setSeconds(120);
-        selectedAnswer = null;
-      }
-    };
     if (seconds === 0) {
+      clearInterval(timer);
       handleNextQuestion();
     }
+
+    return () => clearInterval(timer);
+  }, [seconds, handleNextQuestion]);
+
+  const handleButtonClick = (index) => {
+    setSelectedButtonIndex(index);
+  };
+
+  if (quizCompleted) {
+    const handleStartAgain = () => {
+      window.location.reload();
+    };
+  
     return (
       <div>
-        <div>{currentQuestion.question.text}</div>
-        {answers.map((answer, index) => (
-          <div key={index}>
-            <button
-              color={selectedButtonIndex === index ? "dark" : "light"}
-              onClick={() => handleButtonClick(index)}
-            >
-              {answer}
-            </button>
-          </div>
-        ))}
-        <div>
-          <button onClick={handleNextQuestion}>Next question</button>
-        </div>
-        <div>Correct: {correct}</div>
-        <div>Wrong: {wrong}</div>
-        <div>Timer: {seconds} seconds</div>
+        <h2>Congratulations!</h2>
+        <p>
+          You have {correct} correct answers from {questions.length} questions.
+        </p>
+        <button onClick={handleStartAgain}>Start Again</button>
       </div>
     );
   }
-
-  return null;
+  
+  return (
+    <div>
+      <div>{currentQuestion.question.text}</div>
+      {answers.map((answer, index) => (
+        <div key={index}>
+          <button
+            style={{
+              backgroundColor: selectedButtonIndex === index ? "dark" : "light",
+            }}
+            onClick={() => handleButtonClick(index)}
+          >
+            {answer}
+          </button>
+        </div>
+      ))}
+      <div>
+        <button onClick={handleNextQuestion}>Next question</button>
+      </div>
+      <div>Correct: {correct}</div>
+      <div>Wrong: {wrong}</div>
+      <div>Timer: {seconds} seconds</div>
+    </div>
+  );
 };
 
 export default MyComponent;
