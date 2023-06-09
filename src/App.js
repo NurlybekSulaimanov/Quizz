@@ -23,7 +23,7 @@ function App() {
   return (
     <div className="App">
       <h2>Welcome to the Quiz App!</h2>
-      <p>Press Start to begin the quiz.</p>
+      <p>Press Start to begin the quiz. hello</p>
       <button onClick={handleStartQuiz}>Start</button>
     </div>
   );
