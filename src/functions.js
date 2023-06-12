@@ -1,40 +1,59 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchData } from "./thunk_action_Creator";
-import { useState } from "react";
 import { MyComponents } from "./myComponent";
 
-export const MyComponent = () => {
+export const MyComponent = ({ numQuestions }) => {
   const dispatch = useDispatch();
-  let data = [];
-  data = useSelector((state) => state.data);
-  useEffect(() => {
-    dispatch(fetchData());
-  }, [dispatch]);
+  const data = useSelector((state) => state.data);
+  const [fetchCounter, setFetchCounter] = useState(0);
   let questions = [];
 
-  if (data !== null) {
-    for (let i = 0; i < data.length; i++) {
-      const questionData = data[i];
-      const { question, id, correctAnswer, incorrectAnswers } = questionData;
-      const answers = [correctAnswer, ...incorrectAnswers];
-      for (let i = answers.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [answers[i], answers[j]] = [answers[j], answers[i]];
+  useEffect(() => {
+    const fetchQuestionData = async () => {
+      for (let i = 0; i < numQuestions / 10; i++) {
+        await dispatch(fetchData());
+        setFetchCounter((counter) => counter + 1);
       }
-      questions.push({
-        id,
-        question,
-        answers,
-        correctAnswer,
-      });
-    }
-    return (
-      <div>
-        {questions && Array.isArray(questions) && (
-          <MyComponents questions={questions} />
-        )}
-      </div>
-    );
+    };
+
+    fetchQuestionData();
+  }, [dispatch, numQuestions]);
+
+  if (fetchCounter !== numQuestions / 10) {
+    return null;
   }
+
+  if (data !== null || data.length > 0) {
+    for (let j = 0; j < data.length; j++) {
+      let questionSet = data[j];
+      for (let i = 0; i < questionSet.length; i++) {
+        const questionData = questionSet[i];
+        const { question, id, correctAnswer, incorrectAnswers } = questionData;
+        const answers = [correctAnswer, ...(incorrectAnswers || [])];
+        for (let i = answers.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [answers[i], answers[j]] = [answers[j], answers[i]];
+        }
+        questions.push({
+          id,
+          question,
+          answers,
+          correctAnswer,
+        });
+      }
+    }
+
+    if (questions.length !== 0) {
+      return (
+        <div>
+          {questions && Array.isArray(questions) && (
+            <MyComponents questions={questions} />
+          )}
+        </div>
+      );
+    }
+  }
+  
+  return null;
 };
