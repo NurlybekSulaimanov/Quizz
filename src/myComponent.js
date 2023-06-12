@@ -52,7 +52,7 @@ export const MyComponents = ({ questions }) => {
     const handleStartAgain = () => {
       window.location.reload();
     };
-  
+
     return (
       <div>
         <h2>Congratulations!</h2>
@@ -63,7 +63,7 @@ export const MyComponents = ({ questions }) => {
       </div>
     );
   }
-  
+
   return (
     <div>
       <div>{currentQuestion.question.text}</div>

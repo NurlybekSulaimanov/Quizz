@@ -5,16 +5,21 @@ import MyComponent from "./myComponent";
 
 function App() {
   const [startQuiz, setStartQuiz] = useState(false);
+  const [numQuestions, setNumQuestions] = useState(10);
 
   const handleStartQuiz = () => {
     setStartQuiz(true);
+  };
+
+  const handleNumQuestionsChange = (event) => {
+    setNumQuestions(parseInt(event.target.value));
   };
 
   if (startQuiz) {
     return (
       <Provider store={store}>
         <div className="App">
-          <MyComponent />
+          <MyComponent numQuestions={numQuestions} />
         </div>
       </Provider>
     );
@@ -23,7 +28,15 @@ function App() {
   return (
     <div className="App">
       <h2>Welcome to the Quiz App!</h2>
-      <p>Press Start to begin the quiz. hello</p>
+      <p>Choose the number of questions you want:</p>
+      <select value={numQuestions} onChange={handleNumQuestionsChange}>
+        <option value={10}>10 Questions</option>
+        <option value={20}>20 Questions</option>
+        <option value={30}>30 Questions</option>
+        <option value={40}>40 Questions</option>
+        <option value={50}>50 Questions</option>
+      </select>
+      <p>Press Start to begin the quiz.</p>
       <button onClick={handleStartQuiz}>Start</button>
     </div>
   );
