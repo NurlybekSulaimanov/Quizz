@@ -3,33 +3,41 @@ import { useState, useEffect } from "react";
 import "@coreui/coreui/dist/css/coreui.min.css";
 import { MyComponent } from "./functions";
 
-export const MyComponents = ({ questions }) => {
+export const MyComponents = ({ questions, numQuestions, difficulty }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(null);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [correct, setCorrect] = useState(0);
   const [wrong, setWrong] = useState(0);
   const [seconds, setSeconds] = useState(15);
-  const currentQuestion = questions[currentQuestionIndex];
+  const filteredQuestions = questions.filter(
+    (question) => question.difficulty === difficulty
+  );
+  const currentQuestion = filteredQuestions[currentQuestionIndex];
   let answers = currentQuestion.answers;
   const handleNextQuestion = useCallback(() => {
-    const currentQuestion = questions[currentQuestionIndex];
+    const currentQuestion = filteredQuestions[currentQuestionIndex];
     const selectedAnswer = answers[selectedButtonIndex];
-
     if (selectedAnswer === currentQuestion.correctAnswer) {
       setCorrect((prevCorrect) => prevCorrect + 1);
     } else {
       setWrong((prevWrong) => prevWrong + 1);
     }
 
-    if (currentQuestionIndex < questions.length - 1) {
+    if (currentQuestionIndex < numQuestions - 1) {
       setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
       setSelectedButtonIndex(null);
       setSeconds(15);
     } else {
       setQuizCompleted(true);
     }
-  }, [answers, currentQuestionIndex, questions, selectedButtonIndex]);
+  }, [
+    answers,
+    currentQuestionIndex,
+    selectedButtonIndex,
+    numQuestions,
+    filteredQuestions,
+  ]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -57,7 +65,7 @@ export const MyComponents = ({ questions }) => {
       <div>
         <h2>Congratulations!</h2>
         <p>
-          You have {correct} correct answers from {questions.length} questions.
+          You have {correct} correct answers from {numQuestions} questions.
         </p>
         <button onClick={handleStartAgain}>Start Again</button>
       </div>
